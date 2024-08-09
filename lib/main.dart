@@ -1,4 +1,4 @@
-import 'package:fire_base/compomnets/turnOn.dart';
+import 'package:fire_base/view/Widget.dart/pages.dart/turnOn.dart';
 import 'package:fire_base/firebase_options.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
