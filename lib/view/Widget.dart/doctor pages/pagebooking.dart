@@ -176,30 +176,39 @@ Future<void> _showAddAppointmentDialog(DateTime date) async {
       body: Column(
         children: [
          TypeAheadField<dynamic>(
-            controller: nameController,
-            suggestionsCallback: (pattern) async {
-           var snapshot = await _firestore
-             .collection('users')
-        .where('fullname', isGreaterThanOrEqualTo: pattern)
-        .where('fullname', isLessThanOrEqualTo: pattern + '\uf8ff')
-        .get();
-    return snapshot.docs.map((doc) => doc['fullname']).toList();
-  },
-  itemBuilder: (context, suggestion) {
-    return ListTile(
-      title: Text(suggestion),
-    );
-  },
-  onSelected: (suggestion) {
-    nameController.text = suggestion;
-  },
-  builder: (context, controller, focusNode) {
-    return TextField(
-      controller: controller,
-      focusNode: focusNode,
-      decoration: InputDecoration(labelText: 'الاسم'),
-    );
-  },
+           controller: nameController,
+suggestionsCallback: (pattern) async {
+var snapshot = await _firestore
+ .collection('users')
+.where('fullname', isGreaterThanOrEqualTo: pattern)
+ .where('fullname', isLessThanOrEqualTo: pattern + '\uf8ff')
+ .get();
+
+ // استخدام Set لتخزين الأسماء الفريدة
+ Set<String> uniqueNames = {};
+
+for (var doc in snapshot.docs) {
+ uniqueNames.add(doc['fullname']);
+ }
+
+ // تحويل Set إلى List وإرجاعها
+ return uniqueNames.toList();
+},
+itemBuilder: (context, suggestion) {
+return ListTile(
+title: Text(suggestion),
+ );
+},
+onSelected: (suggestion) {
+ nameController.text = suggestion;
+},
+builder: (context, controller, focusNode) {
+ return TextField(
+ controller: controller,
+ focusNode: focusNode,
+ decoration: InputDecoration(labelText: 'الاسم'),
+ );
+},
 ),
           TextField(
             controller: timeController,

@@ -1,9 +1,12 @@
+import 'package:fire_base/view/Widget.dart/pages.dart/sick2.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:animations/animations.dart';
 import 'package:fire_base/view/Widget.dart/pages.dart/pageone1.dart';
 import 'package:flutter/services.dart';
+import 'package:get/get.dart';
 //import 'package:slider_button/slider_button.dart';
 
 class MyCustomWidget extends StatefulWidget {
@@ -25,20 +28,22 @@ class SecondScreen extends StatefulWidget {
 
 class _SecondScreenState extends State<SecondScreen> {
   bool _a = false;
-
+  late int z  ;
   @override
   void initState() {
     super.initState();
     Timer(Duration(milliseconds: 700), () {
       setState(() {
         _a = !_a;
+  z = (FirebaseAuth.instance.currentUser ==null ?  1 : 2) ;
       });
     });
     Timer(Duration(milliseconds: 2000), () {
     /**************************************************************************************************************************************/
-      Navigator.of(context)
-          .pushReplacement(SlideTransitionAnimation(MyWidget()));
-         //  FirebaseAuth.instance.currentUser == null ? MyWidget(): sick2() ;
+  Get.to((FirebaseAuth.instance.currentUser == null ? MyWidget(): sick(FirebaseAuth.instance.currentUser!.uid))) ;
+  //  Navigator.of(context)
+    //     .pushReplacement(SlideTransitionAnimation(MyWidget()));
+        
     /*****************************************************************************************************************************************/
     });
   }

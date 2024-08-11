@@ -176,6 +176,7 @@ class MyWidget extends StatelessWidget {
                             ),
                           ],
                         ),
+                        Expanded(child:
                          Container(
                           
                             margin: EdgeInsets.only(top: 60),
@@ -187,7 +188,7 @@ class MyWidget extends StatelessWidget {
                               child:Icon (Icons.arrow_forward,size: 27,color: Colors.black45,
                                 
                               ),
-                            )),
+                            )), )
                       ],
                     ),
                   )

@@ -7,6 +7,7 @@ import 'package:fire_base/view/Widget.dart/pages.dart/sickreport.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
 import 'package:flutter/widgets.dart';
 import 'package:get/get.dart';
@@ -343,7 +344,10 @@ Future<void> _checkAppointment() async {
       }
     }
 
-    return Scaffold(
+    return  WillPopScope( onWillPop: () async{SystemNavigator.pop(); return false ;} , child:
+    
+    
+    Scaffold(
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         title: Text("BRIGHT EYES"),
@@ -613,6 +617,7 @@ Future<void> _checkAppointment() async {
           ),
         ],
       ),
+    )
     );
   }
 }
