@@ -30,12 +30,16 @@ class _sickState extends State<sick> {
   String _datecontroller = '';
   var _timecontroller = TextEditingController();
 
-  void _loadDates() async {
-    var snapshot = await _firestore.collection('dates').orderBy('date').get();
-    List<DateTime> _dates = snapshot.docs
+ void _loadDates() async {
+  var snapshot = await _firestore.collection('dates').orderBy('date').get();
+  
+  setState(() {
+    _dates = snapshot.docs
         .map((doc) => (doc.data()['date'] as Timestamp).toDate())
         .toList();
-  }
+  });
+}
+
 
   getData() async {
     QuerySnapshot querySnapshot = await FirebaseFirestore.instance
@@ -198,118 +202,139 @@ Future<void> _checkAppointment() async {
     super.initState();
   }
 
-  Future<void> _addAppointment(DateTime date, String name, String time) async {
-    setState(() {});
+ Future<void> _addAppointment(DateTime date, String name, String time) async {
+  setState(() {});
 
-    bool hasConflict = false;
+  bool hasConflict = false;
+
+  // جلب التواريخ المتاحة من مجموعة 'dates'
+  var datesSnapshot = await _firestore
+      .collection('dates')
+      .orderBy('date') // ترتيب التواريخ للحصول على قائمة منظمة
+      .get();
+
+  // تحويل التواريخ إلى قائمة من DateTime
+  List<DateTime> availableDates = datesSnapshot.docs.map((doc) {
+    var dateValue = doc['date'];
+    if (dateValue is Timestamp) {
+      return dateValue.toDate();
+    } else if (dateValue is String) {
+      return DateTime.parse(dateValue);
+    } else {
+      throw Exception("Unexpected date format: ${dateValue.runtimeType}");
+    }
+  }).toList();
+
+  // التحقق مما إذا كان التاريخ المحدد متاحًا
+  bool isDateAvailable = availableDates.contains(date);
+
+  if (!isDateAvailable) {
+    // إذا كان التاريخ غير متاح، عرض التواريخ المتاحة
+    AwesomeDialog(
+      context: Get.context!,
+      dialogType: DialogType.error,
+      animType: AnimType.rightSlide,
+      title: 'التاريخ ليس متوفراً',
+      desc: 'لم يتم فتح هذا التاريخ بعد، يرجى اختيار تاريخ متاح',
+      btnCancelOnPress: () {},
+      btnOkOnPress: () {
+        AwesomeDialog(
+          context: Get.context!,
+          dialogType: DialogType.info,
+          animType: AnimType.rightSlide,
+          title: 'Available Dates',
+          body: Container(
+            width: double.maxFinite,
+            child: ListView.builder(
+              shrinkWrap: true,
+              itemCount: availableDates.length,
+              itemBuilder: (context, index) {
+                return ListTile(
+                  title: Text(DateFormat('yyyy-MM-dd').format(availableDates[index])),
+                  onTap: () {
+                    Navigator.of(context).pop(); // إغلاق قائمة التواريخ المتاحة
+                    AwesomeDialog(
+                      context: Get.context!,
+                      dialogType: DialogType.info,
+                      animType: AnimType.rightSlide,
+                      title: 'تأكيد التاريخ الجديد',
+                      desc: 'هل تود تغيير التاريخ ${DateFormat('yyyy-MM-dd').format(date)} إلى ${DateFormat('yyyy-MM-dd').format(availableDates[index])}؟',
+                      btnCancelOnPress: () {},
+                      btnOkOnPress: () async {
+                        _Datecontroller.text = DateFormat('yyyy-MM-dd').format(availableDates[index]);
+                        print('Date changed to: ${DateFormat('yyyy-MM-dd').format(availableDates[index])}');
+                           AwesomeDialog(
+        context: Get.context!,
+        dialogType: DialogType.info,
+        animType: AnimType.topSlide,
+        title: '',
+        desc: ' !تم استبدال التاريخ لتاريخ متوفر , قم بالحجز الآن ',
+        btnOkOnPress: () {},
+      ).show();
+                      },
+                      btnCancelText: 'Cancel',
+                      btnOkText: 'Confirm',
+                    ).show();
+                  },
+                );
+              },
+            ),
+          ),
+          btnCancelOnPress: () {},
+        ).show();
+      },
+      btnCancelText: 'OK',
+      btnOkText: 'عرض التواريخ المتوفرة',
+    ).show();
+  } else {
+    // في حالة توفر التاريخ، التحقق من تعارض الموعد مع مواعيد أخرى
     var snapshot = await _firestore
         .collection('appointments')
         .where('date', isEqualTo: date)
         .get();
 
-    if (snapshot.docs.isEmpty) {
-      List<QueryDocumentSnapshot> availableDatesSnapshot = await _firestore
-          .collection('appointments')
-          .get()
-          .then((querySnapshot) => querySnapshot.docs);
+    var appointments = snapshot.docs;
+    for (var doc in appointments) {
+      var data = doc.data() as Map<String, dynamic>;
+      DateTime existingTime = DateFormat('HH:mm').parse(data['time']);
+      DateTime newTime = DateFormat('HH:mm').parse(time);
 
-      List<DateTime> availableDates = availableDatesSnapshot.map((doc) {
-        Timestamp timestamp = doc['date'];
-        return timestamp.toDate();
-      }).toList();
+      if ((newTime.difference(existingTime).inMinutes).abs() < 30) {
+        hasConflict = true;
+        break;
+      }
+    }
 
+    if (hasConflict) {
       AwesomeDialog(
         context: Get.context!,
         dialogType: DialogType.error,
-        animType: AnimType.rightSlide,
-        title: 'التاريخ ليس متوفراً',
-        desc: 'لم يتم فتح هذا التاريخ بعد , يرجى اختيار تاريخ متاح ',
-        btnCancelOnPress: () {},
-        btnOkOnPress: () {
-         AwesomeDialog(
-  context: Get.context!,
-  dialogType: DialogType.info,
-  animType: AnimType.rightSlide,
-  title: 'Available Dates',
-  body: Container(
-    width: double.maxFinite,
-    child: ListView.builder(
-      shrinkWrap: true,
-      itemCount: availableDates.toSet().toList().length, // إزالة التكرارات
-      itemBuilder: (context, index) {
-        List<DateTime> uniqueDates = availableDates.toSet().toList(); // قائمة بدون تكرارات
-        return ListTile(
-          title: Text(DateFormat('yyyy-MM-dd').format(uniqueDates[index])),
-          onTap: () {
-            Navigator.of(context).pop();
-            AwesomeDialog(
-              context: Get.context!,
-              dialogType: DialogType.info,
-              animType: AnimType.rightSlide,
-              title: 'تأكيد التاريخ الجديد',
-              desc: 'هل تود تغيير التاريخ ${DateFormat('yyyy-MM-dd').format(date as DateTime)} الى ${DateFormat('yyyy-MM-dd').format(uniqueDates[index])}?',
-              btnCancelOnPress: () {},
-              btnOkOnPress: () async {
-                _Datecontroller.text = DateFormat('yyyy-MM-dd').format(uniqueDates[index]);
-                print('Date changed to: ${DateFormat('yyyy-MM-dd').format(uniqueDates[index])}');
-              },
-              btnCancelText: 'Cancel',
-              btnOkText: 'Confirm',
-            ).show();
-          },
-        );
-      },
-    ),
-  ),
-  btnCancelOnPress: () {},
-).show();
-
-        },
-        btnCancelText: 'OK',
-        btnOkText: 'عرض التواريخ المتوفرة ',
+        animType: AnimType.topSlide,
+        title: 'تعارض في المواعيد',
+        desc: 'يوجد موعد آخر قريب من هذا الموعد، يرجى اختيار موعد آخر',
+        btnOkOnPress: () {},
       ).show();
     } else {
-      var appointments = snapshot.docs;
-      for (var doc in appointments) {
-        var data = doc.data() as Map<String, dynamic>;
-        DateTime existingTime = DateFormat('HH:mm').parse(data['time']);
-        DateTime newTime = DateFormat('HH:mm').parse(time);
-
-        if ((newTime.difference(existingTime).inMinutes).abs() < 30) {
-          hasConflict = true;
-          break;
-        }
-      }
-
-      if (hasConflict) {
-        AwesomeDialog(
-          context: context,
-          dialogType: DialogType.error,
-          animType: AnimType.topSlide,
-          title: 'تعارض في المواعيد',
-          desc: ' يوجد موعد آخر قريب من هذا الموعد, يرجى اختيار موعد آخر ',
-          btnOkOnPress: () {},
-        ).show();
-      } else {
-        await _firestore.collection('appointments').add({
-          'date': date,
-          'name': name,
-          'time': time,
-          'conflict': hasConflict
-        });
-        AwesomeDialog(
-          context: context,
-          dialogType: DialogType.success,
-          animType: AnimType.topSlide,
-          title: 'نجحت العملية',
-          desc: 'تم حجز الموعد بنجاح في ${DateFormat('yyyy-MM-dd HH:mm').format(date)}.',
-          btnOkOnPress: () {
-            Get.back();
-          },
-        ).show();
-      }
+      await _firestore.collection('appointments').add({
+        'date': date,
+        'name': name,
+        'time': time,
+        'conflict': hasConflict
+      });
+      AwesomeDialog(
+        context: Get.context!,
+        dialogType: DialogType.success,
+        animType: AnimType.topSlide,
+        title: 'نجحت العملية',
+        desc: 'تم حجز الموعد بنجاح في ${DateFormat('yyyy-MM-dd HH:mm').format(date)}.',
+        btnOkOnPress: () {
+          Get.back();
+        },
+      ).show();
     }
   }
+}
+
 
   @override
   Widget build(BuildContext context) {
@@ -348,11 +373,40 @@ Future<void> _checkAppointment() async {
     
     
     Scaffold(
-      appBar: AppBar(
-        backgroundColor: Colors.transparent,
-        title: Text("BRIGHT EYES"),
-        centerTitle: true,
+     appBar: AppBar(
+  backgroundColor: Colors.transparent,
+  title: AnimatedTextKit(
+    animatedTexts: [
+      ColorizeAnimatedText(
+        'Bright Eyes',
+        textStyle: TextStyle(
+          fontSize: 28.0,
+          fontWeight: FontWeight.bold,
+        ),
+        colors: [
+          Color.fromARGB(255, 15, 15, 15),
+          Color.fromARGB(255, 119, 119, 119),
+          Color.fromARGB(255, 223, 223, 223),
+        ],
       ),
+    ],
+    isRepeatingAnimation: true,
+    repeatForever: true,
+  ),
+  centerTitle: true,
+  leading: IconButton(
+    icon: Icon(Icons.refresh),
+    onPressed: () {
+      setState(() {
+        getData();
+        _loadDates();
+        _checkAppointment();
+        _checkData();
+      });
+    },
+  ),
+),
+
       body: Stack(
         children: [
           Container(
@@ -372,28 +426,12 @@ Future<void> _checkAppointment() async {
                 style: TextStyle(fontSize: 36),
                 textAlign: TextAlign.start,
               ),
-              AnimatedTextKit(
-          animatedTexts: [
-            ColorizeAnimatedText(
-              '                  Bright Eyes',
-              textStyle: TextStyle(
-                fontSize: 36.0,
-                fontWeight: FontWeight.bold,
-              
+                 Text(
+                "Bright Eyes",
+                style: TextStyle(fontSize: 36),
+                textAlign: TextAlign.end,
               ),
-              colors: [
-               
-                Color.fromARGB(255, 15, 15, 15),
-                Color.fromARGB(255, 249, 249, 247),
-                Color.fromARGB(255, 170, 165, 165),
-                
-              ],
-            ),
-          ],
-          isRepeatingAnimation: true,
-          repeatForever: true,
-
-        ),
+           
               Container(height: 50),
               container(
                 iconn: Icons.event_note_outlined,

@@ -145,8 +145,8 @@ class _bookingState extends State<booking> {
       context: context,
       dialogType: DialogType.question,
       animType: AnimType.topSlide,
-      title: 'إضافة تاريخ جديد',
-      desc: 'هل تريد إضافة تاريخ جديد؟',
+      title:' add new date',
+      desc: 'do you want to add new date ? ',
       btnOkOnPress: _addDate,
       btnCancelOnPress: () {},
     ).show();
@@ -157,8 +157,8 @@ class _bookingState extends State<booking> {
       context: context,
       dialogType: DialogType.warning,
       animType: AnimType.topSlide,
-      title: 'تأكيد الحذف',
-      desc: 'هل تريد حذف هذا التاريخ؟',
+      title: 'confirm deletion',
+      desc: 'do you want to delete this date ?',
       btnOkOnPress: () => _deleteDate(date),
       btnCancelOnPress: () {},
     ).show();
@@ -172,7 +172,7 @@ Future<void> _showAddAppointmentDialog(DateTime date) async {
       context: context,
       dialogType: DialogType.info,
       animType: AnimType.topSlide,
-      title: 'إضافة موعد جديد',
+      title: 'add new date ',
       body: Column(
         children: [
          TypeAheadField<dynamic>(
@@ -206,13 +206,13 @@ builder: (context, controller, focusNode) {
  return TextField(
  controller: controller,
  focusNode: focusNode,
- decoration: InputDecoration(labelText: 'الاسم'),
+ decoration: InputDecoration(labelText: 'name'),
  );
 },
 ),
           TextField(
             controller: timeController,
-            decoration: InputDecoration(labelText: 'الوقت'),
+            decoration: InputDecoration(labelText: 'date'),
             onTap: () async {
               TimeOfDay? picked = await showTimePicker(
                 context: context,
@@ -243,8 +243,8 @@ builder: (context, controller, focusNode) {
       context: context,
       dialogType: DialogType.warning,
       animType: AnimType.topSlide,
-      title: 'تأكيد الحذف',
-      desc: 'هل تريد حذف هذا الموعد؟',
+      title: 'confirm deletion',
+      desc: 'Do you want to delete this appointment ?',
       btnOkOnPress: () => _deleteAppointment(id),
       btnCancelOnPress: () {},
     ).show();
@@ -255,7 +255,7 @@ builder: (context, controller, focusNode) {
     final double _w = MediaQuery.of(context).size.width;
     return Scaffold(
       appBar: AppBar(
-        title: Text('التواريخ والمواعيد'),
+        title: Text('Dates and Times of Reservation'),
         backgroundColor: Colors.lightBlue,
         actions: [
           IconButton(

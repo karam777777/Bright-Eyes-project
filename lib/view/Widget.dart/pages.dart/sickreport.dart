@@ -30,8 +30,8 @@ class _TableWidgetState extends State<sickreport> {
   @override
   void initState() {
     super.initState();
-   // SystemChrome.setPreferredOrientations(
-    //    [DeviceOrientation.landscapeLeft, DeviceOrientation.landscapeRight]);
+   SystemChrome.setPreferredOrientations(
+       [DeviceOrientation.landscapeLeft, DeviceOrientation.landscapeRight]);
 
     _data = [
       ['Distant', '', '', '', '', '', ''],

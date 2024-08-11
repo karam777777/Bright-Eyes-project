@@ -1,6 +1,6 @@
 import 'package:awesome_dialog/awesome_dialog.dart';
 import 'package:fire_base/view/Widget.dart/materialbutton.dart';
-import 'package:fire_base/view/Widget.dart/pages.dart/doctor_main_page.dart';
+import 'package:fire_base/view/Widget.dart/doctor%20pages/doctor_main_page.dart';
 import 'package:fire_base/auth/login222.dart';
 import 'package:fire_base/view/Widget.dart/textformfieldpass.dart';
 import 'package:fire_base/view/Widget.dart/textt.dart';

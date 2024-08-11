@@ -11,24 +11,24 @@ class reportdocotr extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      color: Colors.white,
+    return Container(      color: Colors.white,
       child: ListView(
         children: [
+          Container(height: 20,),
           Container(
             child: Icon(
               Icons.account_circle,
               size: 100,
-              color: Colors.black,
+              color: Color.fromARGB(166, 12, 11, 11),
             ),
           ),
           Container(
-            height: 10,
+            height: 40,
           ),
           Container(
               padding: EdgeInsets.only(left: 1),
               child: Text(
-                "Name:",
+                "  Name:",
                 style: TextStyle(
                     fontSize: 18,
                     fontWeight: FontWeight.w400,
@@ -49,7 +49,7 @@ class reportdocotr extends StatelessWidget {
           Container(
               padding: EdgeInsets.only(left: 1),
               child: Text(
-                "Birthday:",
+                "  Birthday:",
                 style: TextStyle(
                     fontSize: 18,
                     fontWeight: FontWeight.w400,
@@ -68,14 +68,16 @@ class reportdocotr extends StatelessWidget {
             height: 20,
           ),
           Container(
+          
               padding: EdgeInsets.only(left: 1),
               child: Text(
-                "Gender:",
+                "  Gender:",
                 style: TextStyle(
                     fontSize: 18,
                     fontWeight: FontWeight.w400,
                     color: Colors.black54),
               )),
+              Container(height: 10,),
           MaterialButton(
             onPressed: () {},
             child: TextFormField(

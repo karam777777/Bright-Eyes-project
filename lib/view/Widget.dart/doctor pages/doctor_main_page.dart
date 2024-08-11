@@ -1,6 +1,6 @@
 import 'package:fire_base/view/Widget.dart/container.dart';
 import 'package:fire_base/view/Widget.dart/doctor%20pages/pagebooking.dart';
-import 'package:fire_base/view/Widget.dart/pages.dart/the_profiles_in_doctor_pages.dart';
+import 'package:fire_base/view/Widget.dart/doctor%20pages/the_profiles_in_doctor_pages.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
@@ -39,7 +39,7 @@ class doctorr extends StatelessWidget {
             ),
             container(
               iconn: Icons.event_outlined,
-              texttt: "Reservations       ",
+              texttt: "Reservations        ",
               onPressedd: () {
                 Get.to(booking());
               },

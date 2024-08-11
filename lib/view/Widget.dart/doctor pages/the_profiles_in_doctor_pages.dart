@@ -2,9 +2,12 @@
 import 'package:awesome_dialog/awesome_dialog.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:fire_base/view/Widget.dart/report_in_doctor.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:animated_text_kit/animated_text_kit.dart';
+import 'package:get/route_manager.dart';
 class MyCustomUI2 extends StatefulWidget {
   @override
   State<MyCustomUI2> createState() => _MyCustomUI2State();
@@ -119,11 +122,16 @@ class _AnimatedCardsState extends State<AnimatedCards> with SingleTickerProvider
 
   void _deleteUser(String userId) async {
     try {
-      await FirebaseFirestore.instance.collection('users').doc(userId).delete();
-      setState(() {
-        data.removeWhere((doc) => (doc.data() as Map<String, dynamic>)['id'] == userId);
+      // لم أقم بتطبيق الحذف لان ذلك يطلب مصادقة من المستخدم 
+    isLoading  =true ;
+      await   FirebaseFirestore.instance.collection('userTables').doc(userId).delete() ;
+      setState(() async {
+    FirebaseFirestore.instance.collection('userTables').doc(userId).delete() ;
+     
       });
+      isLoading = false ;
     } catch (e) {
+     isLoading = false ;
       print("Error deleting user: $e");
     }
   }
@@ -164,16 +172,23 @@ class _AnimatedCardsState extends State<AnimatedCards> with SingleTickerProvider
               onPressed: () async {
                 try {
                   isLoading = true;
-                  await FirebaseFirestore.instance.collection('users').doc(userId).update({
-                    'fullname': fullnameController.text,
-                    'gender': genderController.text,
-                    'age': ageController.text,
-                  });
+               QuerySnapshot snapshot = await FirebaseFirestore.instance
+        .collection('users')
+        .where('id', isEqualTo: userId)
+        .get();
+
+    for (DocumentSnapshot doc in snapshot.docs) {
+      await doc.reference.update({
+        'fullname': fullnameController.text,
+        'gender': genderController.text,
+        'age': ageController.text,
+      });
+    }
                   setState(() {
                     getData();
                   });
 
-                  Navigator.of(context).pop();
+                  Get.back();
                   isLoading = false;
                 } catch (e) {
                   isLoading = false;
@@ -245,8 +260,8 @@ class _AnimatedCardsState extends State<AnimatedCards> with SingleTickerProvider
                   dialogType: DialogType.warning,
                   headerAnimationLoop: false,
                   animType: AnimType.topSlide,
-                  title: 'Delete User',
-                  desc: 'Are you sure you want to delete this user?',
+                  title: 'Delete the report',
+                  desc: 'Are you sure you want to delete the report of this user?',
                   btnCancelOnPress: () {},
                   btnOkOnPress: () {
                     _deleteUser(userId);

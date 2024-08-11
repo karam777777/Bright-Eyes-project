@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_staggered_animations/flutter_staggered_animations.dart';
 import 'package:animated_text_kit/animated_text_kit.dart';
+import 'package:get/get.dart';
 
 class Awareness extends StatelessWidget {
   @override
@@ -44,7 +45,7 @@ class MedicalInfoPage extends StatelessWidget {
         leading: IconButton(
           icon: Icon(Icons.arrow_back),
           onPressed: () {
-            Navigator.pop(context);
+            Get.back();
           },
         ),
       ),

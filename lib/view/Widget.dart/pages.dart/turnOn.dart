@@ -28,21 +28,19 @@ class SecondScreen extends StatefulWidget {
 
 class _SecondScreenState extends State<SecondScreen> {
   bool _a = false;
-  late int z  ;
   @override
   void initState() {
     super.initState();
     Timer(Duration(milliseconds: 700), () {
       setState(() {
         _a = !_a;
-  z = (FirebaseAuth.instance.currentUser ==null ?  1 : 2) ;
+
       });
     });
     Timer(Duration(milliseconds: 2000), () {
     /**************************************************************************************************************************************/
   Get.to((FirebaseAuth.instance.currentUser == null ? MyWidget(): sick(FirebaseAuth.instance.currentUser!.uid))) ;
-  //  Navigator.of(context)
-    //     .pushReplacement(SlideTransitionAnimation(MyWidget()));
+ //   Navigator.of(context).pushReplacement(SlideTransitionAnimation(MyWidget()));
         
     /*****************************************************************************************************************************************/
     });
@@ -68,7 +66,7 @@ class _SecondScreenState extends State<SecondScreen> {
             curve: Curves.fastLinearToSlowEaseIn,
             width: _a ? _width : 0,
             height: _height,
-            color: Color.fromARGB(255, 71, 131, 200),
+            color: Color.fromARGB(255, 95, 144, 200),
           ),
           Center(
             child:
